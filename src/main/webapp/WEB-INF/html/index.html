@@ -61,11 +61,12 @@ $(function(){
 
 
     window.control = '[ge(add(var(x),mul(cons(2),var(y))),var(z))]';
-    //window.control = 'cons(20),add(var(x),mul(cons(2),var(y))),ge';
+    //window.control = 'var(z),add(var(x),mul(cons(2),var(y))),ge';
     window.partone = '';
     window.denv = '[x->34, y->7, z->50]';
     window.denv_obj = {};
     window.stack_arr = [];
+    window.result = 0;
 
     // 去掉中括号[]
     function clear_bracket(control){
@@ -217,87 +218,143 @@ $(function(){
 
     function control_equals_partone(){
         var operation = get_opration(window.control);
-        if(operation=='ge'){
-            console.log(rule.GE);
-        }else if(operation=='add'){
-            console.log(rule.ADD);
-        }else if(operation=='sub'){
-            console.log(rule.SUB);
-        }
-        var new_control = get_new_control(window.control);
-        window.control = new_control;
-        window.partone = get_global_partone(window.control);
+        //判断是否需要出栈进行运算
+        //ge、add、mul需要出栈，cons()、var()、ge()、add()、mul()不需要出栈
+        if(operation==window.partone){
+            var len = window.stack_arr.length;
+            var first = window.stack_arr[len-1];
+            var second = window.stack_arr[len-2];
+            switch(operation){
+                case 'ge':
+                    console.log(rule.GE);
+                    window.result = (first>=second)? true: false;
+                    break;
+                case 'add':
+                    console.log(rule.ADD);
+                    window.result = first+second;
+                    break;
+                case 'mul':
+                    console.log(rule.MUL);
+                    window.result = first*second;
+                    break;
+                default:
+                    break;
+            }
+            //删除指定元素
+            window.stack_arr.splice(len-1);
+            window.stack_arr.splice(len-2);
+            //添加最新元素
+            len = window.stack_arr.length;
+            window.stack_arr[len] = window.result;
+
+            window.control = get_global_parttwo(window.control);
+            window.partone = get_global_partone(window.control);
+        }else{
+            console.log(rule.OP);
+            var new_control = get_new_control(window.control);
+            window.control = new_control;
+            window.partone = get_global_partone(window.control);
+        } 
     }
 
     function control_not_equals_partone(){
         var operation = get_opration(window.control);
-        if(operation == 'cons'){
-            var first = control.split(',')[0];
-            //console.log(first);
-            var reg = /\d+/ ;
-            var num = first.match(reg)[0];
-            //console.log(num);
+        //判断是否需要出栈进行运算
+        //ge、add、mul需要出栈，cons()、var()、ge()、add()、mul()不需要出栈
+        if(operation==window.partone){
             var len = window.stack_arr.length;
-            window.stack_arr[len]=num;
-            //删除指定元素
-            //stack_arr.splice(stack_arr.length-1);
-            //console.log(stack_arr.length);
-            window.control = control.slice(first.length+1,window.control.length).trim();
-            window.partone = get_global_partone(window.control);
-            
-        }else if(operation == 'var'){
-            var first = control.split(',')[0];
-            //console.log(first);
-            var reg = /\(\w+\)/ ;
-            var variable = first.match(reg)[0];
-            variable = variable.substring(1,variable.length-1);
-            //console.log(variable);
-            var len = window.stack_arr.length;
-            window.stack_arr[len]=denv_obj[variable];
-            //console.log(stack_arr[len]);
-            window.control = control.slice(first.length+1,window.control.length).trim();
-            window.partone = get_global_partone(window.control);
-        }else{
-            if(operation=='ge'){
-                console.log(rule.GE);
-            }else if(operation=='add'){
-                console.log(rule.ADD);
-            }else if(operation=='sub'){
-                console.log(rule.SUB);
+            var first = window.stack_arr[len-1];
+            var second = window.stack_arr[len-2];
+            switch(operation){
+                case 'ge':
+                    console.log(rule.GE);
+                    window.result = (first>=second)? true: false;
+                    break;
+                case 'add':
+                    console.log(rule.ADD);
+                    window.result = first+second;
+                    break;
+                case 'mul':
+                    console.log(rule.MUL);
+                    window.result = first*second;
+                    break;
+                default:
+                    break;
             }
-            var new_control = get_new_control(window.partone);
-            new_control = new_control +','+ get_global_parttwo(window.control);
-            window.control = new_control;
+            //删除指定元素
+            window.stack_arr.splice(len-1);
+            window.stack_arr.splice(len-2);
+            //添加最新元素
+            len = window.stack_arr.length;
+            window.stack_arr[len] = window.result;
+
+            window.control = get_global_parttwo(window.control);
             window.partone = get_global_partone(window.control);
+
+        }else{
+            if(operation == 'cons'){
+                var first = control.split(',')[0];
+                //console.log(first);
+                var reg = /\d+/ ;
+                var num = first.match(reg)[0];
+                //console.log(num);
+                var len = window.stack_arr.length;
+                window.stack_arr[len]=Number(num);
+                window.control = control.slice(first.length+1,window.control.length).trim();
+                window.partone = get_global_partone(window.control);
+                
+            }else if(operation == 'var'){
+                var first = control.split(',')[0];
+                //console.log(first);
+                var reg = /\(\w+\)/ ;
+                var variable = first.match(reg)[0];
+                variable = variable.substring(1,variable.length-1);
+                //console.log(variable);
+                var len = window.stack_arr.length;
+                window.stack_arr[len]=Number(denv_obj[variable]);
+                //console.log(stack_arr[len]);
+                window.control = control.slice(first.length+1,window.control.length).trim();
+                window.partone = get_global_partone(window.control);
+            }else{
+                console.log(rule.OP);
+                var new_control = get_new_control(window.partone);
+                new_control = new_control +','+ get_global_parttwo(window.control);
+                window.control = new_control;
+                window.partone = get_global_partone(window.control);
+            }
         }
+        
     }
 
     function one_step(){
         if(window.control == window.partone){
+            //例如ge(add(var(x),mul(cons(2),var(y))),var(z))
+            //例如ge
             control_equals_partone();   
         }else{
+            //例如var(z),add(var(x),mul(cons(2),var(y))),ge
+            //例如mul,var(x),add,ge
             control_not_equals_partone();
         }
     }
 
-    console.log(window.control);
-    console.log(window.partone);
-    console.log(window.stack_arr);
-    
-    one_step(window.control);
-    console.log(window.control);
-    console.log(window.partone);
-    console.log(window.stack_arr);
+    function run(){
+        console.log('初始状态为：');
+        console.log(window.control);
+        console.log(window.partone);
+        console.log(window.stack_arr);
+        var i=0;
+        while(window.control != ''){
+            i++;
+            console.log('第'+i+'步执行结果为：');
+            one_step(window.control);
+            console.log(window.control);
+            console.log(window.partone);
+            console.log(window.stack_arr);
+        }
+    }
 
-    one_step(window.control);
-    console.log(window.control);
-    console.log(window.partone);
-    console.log(window.stack_arr);
-
-    one_step(window.control);
-    console.log(window.control);
-    console.log(window.partone);
-    console.log(window.stack_arr);
+    run();
     
 });
 </script>

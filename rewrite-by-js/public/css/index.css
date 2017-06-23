@@ -4,6 +4,7 @@
     border-radius: 5px;
     background-color: white;
     color: #333;
+    font-size: 18px;
 }
 .title{
     text-align: center;
@@ -28,6 +29,7 @@
     height: 40px;
     color: #fff;
     background-color: #44A5E6;
+    font-size: 18px;
 }
 
 #one-step{

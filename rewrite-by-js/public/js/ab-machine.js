@@ -310,6 +310,14 @@ var ab_machine = {
             console.log(window.partone);
             console.log(window.stack_arr);
         }
+    },
+    reset: function(){
+        window.control = '';
+        window.partone = '';
+        window.denv = '';
+        window.denv_obj = {};
+        window.stack_arr = [];
+        window.result = 0;
     }
 };
 

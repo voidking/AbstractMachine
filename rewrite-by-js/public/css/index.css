@@ -3,6 +3,7 @@
     padding-bottom: 20px;
     border-radius: 5px;
     background-color: white;
+    color: #333;
 }
 .title{
     text-align: center;
@@ -10,7 +11,7 @@
 .left,.right{
     height: 500px;
     border: 1px solid #eee;
-    padding-top: 30px; 
+    padding-top: 20px; 
 }
 
 .btn-group{
@@ -29,13 +30,19 @@
     background-color: #44A5E6;
 }
 
-.board{
-    height: 450px;
-    overflow-y: auto;
-    color: #333;
+#one-step{
+    float: left;
+}
+#reset{
+    float: right;
 }
 
-.board h3{
+.board{
+    height: 440px;
+    overflow-y: auto;
+}
+
+h3{
     margin: 0 0 10px 0;
     padding: 0;
 }

@@ -44,8 +44,8 @@
             </div>
         </div>
         <div class="right col-md-6">
+            <h3>计算过程：</h3>
             <div class="board">
-                <h3>计算过程：</h3>
                 <!-- <table>
                     <tr>
                         <th colspan="2">初始状态</th>
@@ -93,25 +93,40 @@
 $(function(){
 
     $('#one-step').click(function(){
+        if(window.localStorage.stop == 'true'){
+            layer.msg('计算已完成，请先重置！');
+            return;
+        }
 
         var control = window.localStorage.control;
         var denv = window.localStorage.denv;
-        if(control == undefined || control == 'undefined' || control == '' ){
+        if(typeof(control) == 'undefined' || control == '' ){
 
             control = $('#control').val();
             denv = $('#denv').val();
 
             if(control == '' || denv == ''){
-                layer.msg('Control和DEnv不能为空');
+                layer.msg('Control和DEnv不能为空！');
                 return;
             }
             ab_machine.init(control, denv);
+            window.localStorage.control = window.control;
+            window.localStorage.denv = window.denv;
+            window.localStorage.stop = false;
+            window.localStorage.index = 0;
 
-            if(window.stack_arr.length == 0){
-                window.localStorage.stack = '[]';
-            }else{
-                window.localStorage.stack = '['+window.stack_arr.reverse().toString()+']';
+            var len = window.stack_arr.length;
+            var str = '[';
+            for(var i=0;i<len;i++){
+                str += window.stack_arr[len-i-1];
+                if(i == len-1){
+                    break;
+                }
+                str += ',';
             }
+            str += ']';
+            window.localStorage.stack = str;
+            
             var data = {
                 title: '初始状态',
                 control: '['+window.localStorage.control+']',
@@ -126,39 +141,62 @@ $(function(){
 
             window.localStorage.control = window.control;
             window.localStorage.denv = window.denv;
+            window.localStorage.index++;
             
-            if(window.stack_arr.length == 0){
-                window.localStorage.stack = '[]';
-            }else{
-                window.localStorage.stack = '['+window.stack_arr.reverse().toString()+']';
+            var len = window.stack_arr.length;
+            var str = '[';
+            for(var i=0;i<len;i++){
+                str += window.stack_arr[len-i-1];
+                if(i == len-1){
+                    break;
+                }
+                str += ',';
             }
+            str += ']';
+            window.localStorage.stack = str;
+
             var data = {
-                title: '初始状态',
+                title: '第'+window.localStorage.index+'次计算',
                 control: '['+window.localStorage.control+']',
                 stack: window.localStorage.stack,
                 denv: window.localStorage.denv
             };
             var html = template('table-template', data);
             $('.board').append(html);
+
+            if(window.localStorage.control == ''){
+                window.localStorage.stop = true;
+            }
         }
 
     });
 
     $('#run').click(function(){
-        var control = $('#control').val();
-        var denv = $('#denv').val();
-
-        if(control == '' || denv == ''){
-            layer.msg('Control和DEnv不能为空');
+        if(window.localStorage.stop == 'true'){
+            layer.msg('计算已完成，请先重置！');
             return;
         }
-        ab_machine.init(control, denv);
-        while(window.control != ''){
-            ab_machine.one_step();
-            var control_html = '<p>'+window.control+'</p>';
-            $('.board').append(control_html);
+        
+        reset();
+        $('#one-step').trigger('click');
+        while(window.localStorage.control != ''){
+            $('#one-step').trigger('click');
         }
     });
+
+    $('#reset').click(function(){
+        reset();
+        layer.msg('重置完成！');
+    });
+
+    function reset(){
+        ab_machine.reset();
+        window.localStorage.control = window.control;
+        window.localStorage.denv = window.denv;
+        window.localStorage.stop = false;
+        window.localStorage.index = 0;
+        $('.board').html('');
+    }
     
 });
 </script>

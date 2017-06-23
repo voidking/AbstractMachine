@@ -18,7 +18,7 @@ html, body {
 }
 
 .sky .clouds_one {
-  background: url("../img/cloud_one.png") no-repeat;
+  background: url("../img/cloud_one.png");
   background-size: auto 100%;
   position: absolute;
   left: 0;
@@ -36,7 +36,7 @@ html, body {
 }
 
 .sky .clouds_two {
-  background: url("../img/cloud_two.png") no-repeat;
+  background: url("../img/cloud_two.png");
   background-size: auto 100%;
   position: absolute;
   left: 0;
@@ -54,7 +54,7 @@ html, body {
 }
 
 .sky .clouds_three {
-  background: url("../img/cloud_three.png") no-repeat;
+  background: url("../img/cloud_three.png");
   background-size: auto 100%;
   position: absolute;
   left: 0;

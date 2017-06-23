@@ -310,18 +310,6 @@ var ab_machine = {
             console.log(window.partone);
             console.log(window.stack_arr);
         }
-    },
-    get_control: function(){
-        return window.control;
-    },
-    get_partone: function(){
-        return window.partone;
-    },
-    get_parttwo: function(){
-        return window.parttwo;
-    },
-    get_stack_arr: function(){
-        return window.stack_arr;
     }
 };
 

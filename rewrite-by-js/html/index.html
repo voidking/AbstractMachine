@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../public/libs/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="../public/libs/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../public/css/style.css">
     <link rel="stylesheet" href="../public/css/index.css">
     <title>语言Le的计算过程</title>
 </head>
-<body>
+<body class="sky">
     <div class="container">
-        <h1 class="title">语言L<sub>e</sub>的计算过程动画演示</h1>
+        <div class="clouds_one"></div>
+        <div class="clouds_two"></div>
+        <div class="clouds_three"></div>
+
+        <h1 class="title">语言L<sub>e</sub>的计算过程演示</h1>
         <div class="left col-md-6">
             <div class="form-group">
                 <input type="text" id="control" class="form-control control" placeholder="Control">
@@ -17,34 +22,126 @@
             <div class="form-group">
                 <input type="text" id="denv" class="form-control denv" placeholder="DEnv">
             </div>
-            <div class="form-group">
-                <input id="one-step" type="button" class="btn btn-primary" value="OneStep">
-                <input id="run" type="button" class="btn btn-primary" value="Run">
+            <div class="form-group btn-group">
+                <table>
+                    <tr>
+                        <td>
+                            <input id="one-step" type="button" class="btn" value="OneStep">
+                        </td>
+                        <td>
+                            <input id="run" type="button" class="btn" value="Run">
+                        </td>
+                        <td>
+                            <input id="reset" type="button" class="btn" value="Reset">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="form-group" style="clear:both; color: #333;padding-top: 20px;">
+                <p>示例：</p>
+                <p>Control：[ge(add(var(x),mul(cons(2),var(y))),var(z))]</p>
+                <p>DEnv：[x->34, y->7, z->50]</p>
             </div>
         </div>
         <div class="right col-md-6">
             <div class="board">
-                
+                <h3>计算过程：</h3>
+                <!-- <table>
+                    <tr>
+                        <th colspan="2">初始状态</th>
+                    </tr>
+                    <tr>
+                        <td>Control</td>
+                        <td>[ge(add(var(x),mul(cons(2),var(y))),var(z))]</td>
+                    </tr>
+                    <tr>
+                        <td>Stack</td>
+                        <td>[]</td>
+                    </tr>
+                    <tr>
+                        <td>DEnv</td>
+                        <td>[x->34, y->7, z->50]</td>
+                    </tr>
+                </table> -->
             </div>
         </div>
     </div>
+<script id="table-template" type="text/html">
+    <table>
+        <tr>
+            <th colspan="2">{{title}}</th>
+        </tr>
+        <tr>
+            <td>Control</td>
+            <td>{{control}}</td>
+        </tr>
+        <tr>
+            <td>Stack</td>
+            <td>{{stack}}</td>
+        </tr>
+        <tr>
+            <td>DEnv</td>
+            <td>{{denv}}</td>
+        </tr>
+    </table>
+</script>
 <script src="../public/libs/jquery/jquery.min.js"></script>
 <script src="../public/libs/layer/layer.js"></script>
+<script src="../public/libs/art-template/dist/template.js"></script>
 <script src="../public/js/ab-machine.js"></script>
 <script>
 $(function(){
-    $('#one-step').click(function(){
-        //var control = '[ge(add(var(x),mul(cons(2),var(y))),var(z))]';
-        //var denv = '[x->34, y->7, z->50]';
-        var control = $('#control').val();
-        var denv = $('#denv').val();
 
-        if(control == '' || denv == ''){
-            layer.msg('Control和DEnv不能为空');
-            return;
+    $('#one-step').click(function(){
+
+        var control = window.localStorage.control;
+        var denv = window.localStorage.denv;
+        if(control == undefined || control == 'undefined' || control == '' ){
+
+            control = $('#control').val();
+            denv = $('#denv').val();
+
+            if(control == '' || denv == ''){
+                layer.msg('Control和DEnv不能为空');
+                return;
+            }
+            ab_machine.init(control, denv);
+
+            if(window.stack_arr.length == 0){
+                window.localStorage.stack = '[]';
+            }else{
+                window.localStorage.stack = '['+window.stack_arr.reverse().toString()+']';
+            }
+            var data = {
+                title: '初始状态',
+                control: '['+window.localStorage.control+']',
+                stack: window.localStorage.stack,
+                denv: window.localStorage.denv
+            };
+            var html = template('table-template', data);
+            $('.board').append(html);  
+        }else{
+
+            ab_machine.one_step();
+
+            window.localStorage.control = window.control;
+            window.localStorage.denv = window.denv;
+            
+            if(window.stack_arr.length == 0){
+                window.localStorage.stack = '[]';
+            }else{
+                window.localStorage.stack = '['+window.stack_arr.reverse().toString()+']';
+            }
+            var data = {
+                title: '初始状态',
+                control: '['+window.localStorage.control+']',
+                stack: window.localStorage.stack,
+                denv: window.localStorage.denv
+            };
+            var html = template('table-template', data);
+            $('.board').append(html);
         }
-        ab_machine.init(control, denv);
-        ab_machine.one_step();
+
     });
 
     $('#run').click(function(){
@@ -56,7 +153,11 @@ $(function(){
             return;
         }
         ab_machine.init(control, denv);
-        ab_machine.run();
+        while(window.control != ''){
+            ab_machine.one_step();
+            var control_html = '<p>'+window.control+'</p>';
+            $('.board').append(control_html);
+        }
     });
     
 });

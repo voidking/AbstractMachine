@@ -34,6 +34,7 @@ var ab_machine = {
         window.denv = denv;
         window.denv_obj = {};
         window.stack_arr = [];
+        window.rule = '';
         window.result = 0;
 
         //格式化初始值
@@ -199,14 +200,17 @@ var ab_machine = {
             var second = window.stack_arr[len-2];
             switch(operation){
                 case 'ge':
+                    window.rule=this.rule.GE;
                     console.log(this.rule.GE);
                     window.result = (first>=second)? true: false;
                     break;
                 case 'add':
+                    window.rule=this.rule.ADD;
                     console.log(this.rule.ADD);
                     window.result = first+second;
                     break;
                 case 'mul':
+                    window.rule=this.rule.MUL;
                     console.log(this.rule.MUL);
                     window.result = first*second;
                     break;
@@ -223,6 +227,7 @@ var ab_machine = {
             window.control = this.get_global_parttwo(window.control);
             window.partone = this.get_global_partone(window.control);
         }else{
+            window.rule=this.rule.OP;
             console.log(this.rule.OP);
             var new_control = this.get_new_control(window.control);
             window.control = new_control;
@@ -239,14 +244,17 @@ var ab_machine = {
             var second = window.stack_arr[len-2];
             switch(operation){
                 case 'ge':
+                    window.rule=this.rule.GE;
                     console.log(this.rule.GE);
                     window.result = (first>=second)? true: false;
                     break;
                 case 'add':
+                    window.rule=this.rule.ADD;
                     console.log(this.rule.ADD);
                     window.result = first+second;
                     break;
                 case 'mul':
+                    window.rule=this.rule.MUL;
                     console.log(this.rule.MUL);
                     window.result = first*second;
                     break;
@@ -274,6 +282,7 @@ var ab_machine = {
                 window.stack_arr[len]=Number(num);
                 window.control = control.slice(first.length+1,window.control.length).trim();
                 window.partone = this.get_global_partone(window.control);
+                window.rule = this.rule.CONS;
                 
             }else if(operation == 'var'){
                 var first = control.split(',')[0];
@@ -287,12 +296,14 @@ var ab_machine = {
                 //console.log(stack_arr[len]);
                 window.control = control.slice(first.length+1,window.control.length).trim();
                 window.partone = this.get_global_partone(window.control);
+                window.rule = this.rule.VAR;
+
             }else{
-                console.log(this.rule.OP);
                 var new_control = this.get_new_control(window.partone);
                 new_control = new_control +','+ this.get_global_parttwo(window.control);
                 window.control = new_control;
                 window.partone = this.get_global_partone(window.control);
+                window.rule = this.rule.OP;
             }
         }
     },
@@ -317,6 +328,7 @@ var ab_machine = {
         window.denv = '';
         window.denv_obj = {};
         window.stack_arr = [];
+        window.rule='';
         window.result = 0;
     }
 };

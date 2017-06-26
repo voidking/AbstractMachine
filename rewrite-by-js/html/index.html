@@ -162,6 +162,7 @@ $(function(){
                 stack: window.localStorage.stack,
                 denv: window.localStorage.denv
             };
+            $('.board').append('<p>'+window.rule+'</p>');
             var html = template('table-template', data);
             $('.board').append(html);
 
